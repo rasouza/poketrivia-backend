@@ -2,22 +2,19 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const url = "https://pokeapi.co/api/v2/pokemon/";
+const util = require('util')
 
 var answers = {};
 
+const fs = require('fs');
+const pokejson = require('./pokemons.json');
+
 function getPokemon(id) {
-  return axios.get(url + id).then(({data:{name, id, sprites:{front_default:image}}}) => {
-      return (
-        {
-          id: id,
-          name: name,
-          image: image
-        }
-      );
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
+    return ({
+            id: id,
+            name: pokejson[id].name,
+            image: pokejson[id].image
+        })
 }
 
 function getRandomNumber(limit) {
@@ -56,7 +53,7 @@ router.get('/question', async function(req, res) {
             name: values[2].name
           }
         ]
-      }
+      };
       answers[question.id] = question.options[0].id
       question.options.sort((a,b) => 0.5 - Math.random());
       res.json(question)
