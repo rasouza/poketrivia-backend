@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var axios = require('axios');
+const express = require('express');
+const router = express.Router();
+const axios = require('axios');
 const url = "https://pokeapi.co/api/v2/pokemon/";
 
 var answers = {};
@@ -16,20 +16,31 @@ function getPokemon(id) {
       );
     })
     .catch(function (error) {
-      // handle error
       console.log(error);
     })
 }
 
+function getRandomNumber(limit) {
+  return Math.floor(1 + Math.random() * (limit - 1))
+}
+
+function getRandomNumbers(quantity = 3, limit = 151) {
+  const map = {}
+  while (Object.keys(map).length < quantity) {
+    map[getRandomNumber(limit)] = null
+  }
+  return Object.keys(map)
+}
+
 router.get('/question', async function(req, res) {
-    const promises = []
-    for(i = 0;i < 3;i++) {
-      promises.push(getPokemon(Math.floor(1 + Math.random() * (151 - 1))))
-    }
+    const randomIds = getRandomNumbers()
+    const promises = randomIds.map(id => {
+      return getPokemon(id)
+    })
     await Promise.resolve()
     Promise.all(promises).then((values) => {
       const question = {
-        id: Math.floor(1 + Math.random() * (9999 - 1)),
+        id: getRandomNumber(9999),
         image: values[0].image,
         options: [
           {
